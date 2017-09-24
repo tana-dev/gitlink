@@ -6,13 +6,14 @@ import (
 	// "../git"
 )
 
+// var url = "http://10.27.145.100:8080/"
+var url = "http://192.168.33.22:8080/"
+
 func Regist() {
 
 	var url string
 	var currentDir string
 
-	url = "http://10.27.145.100:8080/"
-	url = "http://192.168.33.22:8080/"
 
 	// fpath = r.URL.Path
 	// fpath1 := r.URL.Path
@@ -30,7 +31,6 @@ func Regist() {
     //
     // git.Clone(cloneUrl)
     // os.Chdir(currentDir)
-    action.Regist()
 	fmt.Println("tanaka")
 
 	// out, _ := exec.Command("git", "branch", "-r").Output()

@@ -11,37 +11,29 @@ import (
 )
 
 func main() {
+
+	// fpath := r.URL.Path
+	// fpath = strings.TrimRight(fpath1, "/")
+    u, err := url.Parse("http://user1@bing.com/search?q=foo%2fbar&q2=hoge#fragment")
+    if err != nil {
+      log.Fatal(err)
+    }
+    path = u.Path
+    fmt.Printf("Path: %s\n", u.Path)
+    fmt.Printf("RawQuery: %s\n", u.RawQuery)
+
+
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
-	http.HandleFunc("/", handler)
+
+    http.HandleFunc("/",func(w http.ResponseWriter, r *http.Request){
+        if r.URL.Path == "/regist/" {
+            action.Regist(w)
+        } else if r.URL.Path == "/diff/" {
+            action.Diff(w)
+        }
+    })
+
 	http.ListenAndServe(":8081", nil)
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-
-	// var url string
-	// var currentDir string
-
-	// url = "http://10.27.145.100:8080/"
-	// url = "http://192.168.33.22:8080/"
-
-	// fpath = r.URL.Path
-	// fpath1 := r.URL.Path
-	// fpath1 = strings.TrimRight(fpath1, "/")
-
-	// pathを取るにはr.URL.Pathで受け取文末のスラッシュを削除
-	// fpath = strings.TrimRight(fpath, "/") // 2. Linux
-	// fname = filepath.Base(fpath)
-
-    a := "Regist"
-    action.a()
-	fmt.Println("tanaka")
-
-	// out, _ := exec.Command("git", "branch", "-r").Output()
-	// fmt.Println(string(out))
-
-	// tmpl := template.Must(template.ParseFiles("./view/index.html"))
-	// tmpl.Execute(w, h)
-
 }
 
 func createDir(dir string) {
