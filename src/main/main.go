@@ -22,18 +22,20 @@ func main() {
     fmt.Printf("Path: %s\n", u.Path)
     fmt.Printf("RawQuery: %s\n", u.RawQuery)
 
-
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(assetFS()))))
 
     http.HandleFunc("/",func(w http.ResponseWriter, r *http.Request){
         if r.URL.Path == "/regist/" {
             action.Regist(w)
+        } else if r.URL.Path == "/files/" {
+            action.Diff(w)
         } else if r.URL.Path == "/diff/" {
             action.Diff(w)
         }
     })
 
-	http.ListenAndServe(":8081", nil)
+	http.ListenAndServe(":12000", nil)
 }
 
 func createDir(dir string) {
