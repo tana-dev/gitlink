@@ -22,7 +22,6 @@ func Regist() {
 	var url string
 	var currentDir string
 
-
 	// fpath = r.URL.Path
 	// fpath1 := r.URL.Path
 	// fpath1 = strings.TrimRight(fpath1, "/")

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="icon" href="/resources/img/favicon_g_green.gif">
+
+		<title>GitLocal</title>
+
+		<!-- Bootstrap core CSS -->
+		<link href="/resources/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/resources/css/railscasts.css" rel="stylesheet">
+
+		<!-- Custom styles for this template -->
+		<link href="/resources/css/dashboard.css" rel="stylesheet">
+
+		<!-- font-awesome -->
+		<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" >
+		<script src="/resources/js/highlight.pack.js"></script>
+		<script src="/resources/js/highlightjs-line-numbers.js"></script>
+		<script src="/resources/js/bootstrap.min.js" type="text/javascript"></script>
+
+		<!-- js -->
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.3/js/tether.js"></script>
+		<script type="text/javascript" src="/resources/js/bootstrap.min.js"></script>
+	</head>
+
+	<body>
+		<nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+			<button class="navbar-toggler navbar-toggler-right hidden-lg-up" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<a class="navbar-brand" style="color: #00ff00;">GitLocal</a>
+			<div class="collapse navbar-collapse" id="navbarsExampleDefault">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" id="repository" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Repository</a>
+						<div class="dropdown-menu" aria-labelledby="repository">
+						{{range $link, $name := .Repository}}
+							<a class="dropdown-item" href="{{$link}}">{{$name}}</a>
+						{{end}}
+						</div>
+					</li>
+				</ul>
+			</div>
+		</nav>
+
+		<div class="container-fluid">
+			<div class="row">
+				<nav class="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">
+					<ul class="nav nav-pills flex-column">
+						{{range $link, $name := .Sidelink}}
+							<a class="nav-link" href="{{$link}}">{{$name}}</a>
+						{{end}}
+						<li class="nav-item">
+							<a class="nav-link active" href="#">Overview <span class="sr-only">(current)</span></a>
+						</li>
+					</ul>
+				</nav>
+
+				<main class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
+					<h1>Files</h1>
+					<!-- <form><input type="text" id="search"/></form> -->
+					<ol class="breadcrumb">
+					{{range $index, $var := .Breadcrumbs}}
+						<li class="breadcrumb-item" ><a href="{{$index}}">{{$var}}</a></li>
+					{{end}}
+					</ol>
+					{{if .Viewflg}}
+					<pre><code>{{.Line}}</code></pre>
+					{{else}}
+					<table class="table table-striped">
+						<tr>
+							<th>Name</th>
+							<th>Last Upadate</th>
+						</tr>
+						{{range $file := .FileinfoList}}
+						<tr>
+							<td>
+								<a calss="text-muted" href="{{index $file 0}}" style="color:#000000;"><i class="fa {{index $file 3}}"></i> {{index $file 1}}</a>
+							</td>
+							<td>
+								<span>{{index $file 2}}</span>
+							</td>
+						</tr>
+						{{end}}
+					</table>
+					{{end}}
+
+				</main>
+			</div>
+		</div>
+
+		<!-- Bootstrap core JavaScript
+		================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+		<script language='javascript' type='text/javascript'>
+		(function(window){
+		'use strict';
+		window.addEventListener('load', function(){
+			[].forEach.call(document.querySelectorAll('pre > code'), function(elem){
+				// <br>を\nに置換
+				elem.innerHTML = elem.innerHTML.replace(/<br\s*[\/]?>/gi, '\n');
+
+				// highlight.js は <code> 内の先頭と末尾の改行を無視してくれないので、ここで削除
+				// ※ HTML を書く際、先頭と末尾に改行を入れない方法もある
+				elem.textContent = elem.textContent.replace(/^[\r\n]+|[\r\n]+$/g, '');
+
+				// highlight.js の適用
+				hljs.highlightBlock(elem);
+
+				// highlightjs-line-numbers.js の適用
+				hljs.lineNumbersBlock(elem);
+			});
+		});
+		})(window);
+		</script>
+
+	</body>
+</html>
