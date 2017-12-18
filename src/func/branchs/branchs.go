@@ -51,10 +51,12 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	repository = map[string]string{}
 	repos := dirwalk("./repository")
 	for _, rp := range repos {
-		//link := strings.Replace(fp, `\`, "/", -1)      // 1.Windows
+		var link string
+		var name string
+		link = strings.Replace(rp, `\`, "/", -1)      // 1.Windows
 		//link = url + strings.Replace(link, "/", "", 2) // 1.Windows
-		link := url + "/files" + strings.Replace(rp, "repository", "", 1) + "/" // 2.Linux
-		name := filepath.Base(rp)
+		link = url + "/files" + strings.Replace(link, "repository", "", 1) + "/" // 2.Linux
+		name = filepath.Base(rp)
 		repository[link] = name
 	}
 
