@@ -19,6 +19,7 @@ type Html struct {
 	User         string
 	Ip           string
 	Repository   map[string]string
+	Clone        string
 //	Line         []string
 	Line         string
 	Viewflg      bool
@@ -35,6 +36,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	var fpath string
 //	var fname string
 	var repository map[string]string
+	var clone string
 	var sidelink map[string]string
 //	var line []string
 	var line string
@@ -70,6 +72,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		name = filepath.Base(rp)
 		repository[link] = name
 	}
+
+	// cloneセット
+	clone = url + "/clone"
 
 	// sidelinkセット
 	sidelink = map[string]string{}
@@ -183,6 +188,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		User:         user,
 		Ip:           ip,
 		Repository:   repository,
+		Clone:        clone,
 		Line:         line,
 		Viewflg:      viewflg,
 		Sidelink:     sidelink,

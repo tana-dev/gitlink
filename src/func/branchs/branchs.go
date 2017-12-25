@@ -19,6 +19,7 @@ type Html struct {
 	Repository map[string]string
 	BranchList [][]string
 	Sidelink     map[string]string
+	Clone        string
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +27,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	var user string
 	var ip string
 	var branchList [][]string
+	var clone string
 	var url string
 	var fpath string
 	var repository map[string]string
@@ -60,6 +62,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		repository[link] = name
 	}
 
+	// cloneセット
+	clone = url + "/clone"
+
 	// sidelinkセット
 	sidelink = map[string]string{}
 	funk := []string{"files", "branchs"}
@@ -78,47 +83,39 @@ func Index(w http.ResponseWriter, r *http.Request) {
     defer os.Chdir(prev)
 
     // ディレクトリ移動
-    os.Chdir("./repository/fileshare")
+    os.Chdir("./repository/" + current_repo)
+
+	// branch一覧取得
+	branchs := git.Branch()
+	for _, b := range strings.Split(string(branchs), "\n") {
+		if  slashNum := strings.Index(b, ">"); slashNum != -1 {
+			// アクティヴbranch
+			continue
+		} else if slashNum := strings.Index(b, "/"); slashNum == -1 {
+			// 改行のみ
+			continue
+		} else {
+			// branch格納
+			b = b[slashNum+1:]
+			var branch []string
+			branch = append(branch, url)
+			branch = append(branch, b)
+			branch = append(branch, "2017")
+			branchList = append(branchList, branch)
+		}
+	}
 
     // ディレクトリ移動
     os.Chdir(prev)
 
-    git.Branch()
-
-	// branchList作成
-	var branch []string
-	branch = append(branch, url)
-	branch = append(branch, "master")
-	branch = append(branch, "2017")
-	branchList = append(branchList, branch)
-
-	// fpath = r.URL.Path
-	// fpath1 := r.URL.Path
-	// fpath1 = strings.TrimRight(fpath1, "/")
-
-	// pathを取るにはr.URL.Pathで受け取文末のスラッシュを削除
-	// fpath = strings.TrimRight(fpath, "/") // 2. Linux
-	// fname = filepath.Base(fpath)
-
-	// currentDir, _ = filepath.Abs(".")
-	// createDir(currentDir + "/repositories")
-    //
-	// cloneUrl := "https://github.com/tana-dev/practice.git"
-    // os.Chdir(currentDir + "/repositories")
-    //
-    // git.Clone(cloneUrl)
-    // os.Chdir(currentDir)
-	fmt.Println("tanaka")
-
-	// out, _ := exec.Command("git", "branch", "-r").Output()
-	// fmt.Println(string(out))
-
+	// htmlセット
 	h := Html{
 		User:         user,
 		Ip:           ip,
 		Repository:   repository,
 		BranchList:   branchList,
 		Sidelink:     sidelink,
+		Clone:        clone,
 	}
 
 	tmpl, _ := template.ParseFiles("./resources/view/branchs/index.html")

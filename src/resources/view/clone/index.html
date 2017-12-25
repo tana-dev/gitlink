@@ -42,21 +42,32 @@
 						{{range $link, $name := .Repository}}
 							<a class="dropdown-item" href="{{$link}}">{{$name}}</a>
 						{{end}}
-						<li class="nav-item"><a class="nav-link" href="{{.Clone}}">Clone</a></li>
 						</div>
 					</li>
+					<li class="nav-item"><a class="nav-link" href="{{.Clone}}">Clone</a></li>
 				</ul>
 			</div>
 		</nav>
 
-		<div class="container-fluid">
+		<div class="container">
 			<div class="row">
 				<main class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
 					<h1>Clone</h1>
 					<!-- <form><input type="text" id="search"/></form> -->
 					<form method="post" action="/clone/regist/">
-						<text width="1000" id="cloneurl" placeholder="URL"></text>
-						<input type="submit" name="submit" class="btn btn-primary" value="実行">
+						<div class="form-group">
+							<label for="url">Url</label>
+							<input type="url" class="form-control col-3" id="url" name="url" placeholder="Url">
+						</div>
+						<div class="form-group">
+							<label for="account">Account</label>
+							<input type="account" class="form-control col-3" id="account" name="account" aria-describedby="emailHelp" placeholder="Account">
+						</div>
+						<div class="form-group">
+							<label for="password">Password</label>
+							<input type="password" class="form-control col-3" id="password" name="password" placeholder="Password">
+						</div>
+						<button type="submit" class="btn btn-primary">clone</button>
 					</form>
 				</main>
 			</div>
@@ -66,7 +77,6 @@
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->
 		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-		<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 		<script language='javascript' type='text/javascript'>
 		(function(window){
 		'use strict';

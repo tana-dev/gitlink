@@ -27,6 +27,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	var user string
 	var url string
 	var fpath string
+	var clone string
 //	var download map[string]string
 //	var upload string
 //	var pathchange string
@@ -45,7 +46,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	// レポジトリー取得
 	fpath = r.URL.Path
+fmt.Println(fpath)
 	fpath = strings.Replace(fpath, "/files/", "", 1)
+fmt.Println(fpath)
 //	fpath = strings.TrimRight(fpath, "/")
 
 	// repositoryセット
@@ -61,10 +64,14 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		repository[link] = name
 	}
 
+	// cloneセット
+	clone = url + "/clone"
+
 	h := Html{
 		User:         user,
 		Ip:           ip,
 		Repository:   repository,
+		Clone:        clone,
 	}
 
 	fmt.Println("Regist Index")
@@ -74,26 +81,23 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 func Regist(w http.ResponseWriter, r *http.Request) {
 
-//	var ip string
-//	var fpath string
-//	var download map[string]string
-//	var upload string
-//	var pathchange string
+    if r.Method != "POST" {
+        http.Error(w, "Allowed POST method only", http.StatusMethodNotAllowed)
+        return
+    }
 
-	// ユーザー設定情報取得
-//	userConfig, err := appconfig.Parse("./config/user.json")
-//	if err != nil {
-//		fmt.Println("error ")
-//	}
+    for k, v := range r.Form {
+        fmt.Println("key:", k)
+        fmt.Println("val:", strings.Join(v, ""))
+    }
 
-	// ユーザー情報セット
-//	ip = userConfig.Host + ":"+ userConfig.Port
+	r.ParseForm()
+	url := r.Form["url"][0]
+	account := r.Form["account"][0]
+	password := r.Form["password"][0]
+	url = strings.Replace(url, "http://", "", 1)
 
-	// レポジトリー取得
-//	fpath = r.URL.Path
-//	fpath = strings.Replace(fpath, "/files/", "", 1)
-//	slashNum := strings.Index(fpath, "/")
-//	current_repo := fpath[0:slashNum]
+	cloneUrl := "http://" + account + ":" + password + "@" + url
 
     // あらかじめ戻り先を絶対パスに展開しておく
     prev, err := filepath.Abs(".")
@@ -105,7 +109,7 @@ func Regist(w http.ResponseWriter, r *http.Request) {
     // ディレクトリ移動
     os.Chdir("repository")
 
-	cloneUrl := "http://tanaka-shu:st1127pass@glab.gnavi.co.jp/attribute/attribute.git"
+    // clone
     git.Clone(cloneUrl)
 
 	// ディレクトリ移動

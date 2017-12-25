@@ -11,10 +11,10 @@ func Clone(url string) {
 	fmt.Println(string(out))
 }
 
-func Branch() {
+func Branch() ([]byte) {
 
 	out, _ := exec.Command("git", "branch", "-r").Output()
-	fmt.Println(string(out))
+	return out;
 }
 
 func Diff() {
