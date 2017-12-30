@@ -4,7 +4,7 @@ import (
 	"fmt"
     "html/template"
     // "io"
-    "io/ioutil"
+//    "io/ioutil"
     "net/http"
     "os"
     "path/filepath"
@@ -12,26 +12,31 @@ import (
 //	"os/exec"
 	"../../lib/git"
 	"../../lib/appconfig"
+	"../../lib/util"
+)
+
+const funcname = "clone"
+
+var (
+	ip string
+	user string
+	repository map[string]string
+	clone string
+	url string
+	//fpath string
+	//download map[string]string
+	//upload string
+	//pathchange string
 )
 
 type Html struct {
-	User         string
 	Ip           string
+	User         string
 	Repository   map[string]string
 	Clone        string
 }
 
-func Index(w http.ResponseWriter, r *http.Request) {
-
-	var ip string
-	var user string
-	var url string
-	var fpath string
-	var clone string
-//	var download map[string]string
-//	var upload string
-//	var pathchange string
-	var repository map[string]string
+func init(){
 
 	// ユーザー設定情報取得
 	userConfig, err := appconfig.Parse("./config/user.json")
@@ -44,29 +49,17 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	url = userConfig.Protocol + "://"+ ip
 	user = userConfig.Username
 
-	// レポジトリー取得
-	fpath = r.URL.Path
-fmt.Println(fpath)
-	fpath = strings.Replace(fpath, "/files/", "", 1)
-fmt.Println(fpath)
-//	fpath = strings.TrimRight(fpath, "/")
-
-	// repositoryセット
+	// repository(navvar)セット
 	repository = map[string]string{}
-	repos := dirwalk("repository")
-	for _, rp := range repos {
-		var name string
-		link := rp
-		link = strings.Replace(link, `\`, "/", -1)                // 1.Windows
-//		link = url + "/files" + strings.Replace(link, "/", "", 2) // 1.Windows
-		link = url + "/files" + strings.Replace(link, "repository", "", 1) + "/" // 2.Linux
-		name = filepath.Base(rp)
-		repository[link] = name
-	}
+	repository = util.CreateRepository(url)
 
-	// cloneセット
+	// clone(navvar)セット
 	clone = url + "/clone"
+}
 
+func Index(w http.ResponseWriter, r *http.Request) {
+
+	// view情報
 	h := Html{
 		User:         user,
 		Ip:           ip,
@@ -117,39 +110,4 @@ func Regist(w http.ResponseWriter, r *http.Request) {
 
 	// リダイレクト
 	http.Redirect(w, r, "/clone/", http.StatusFound)
-}
-
-func dirwalk(dir string) []string {
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		panic(err)
-	}
-
-	var paths []string
-	var dpaths []string
-	var fpaths []string
-	for _, file := range files {
-		if 0 != strings.Index(file.Name(), ".") && 0 != strings.Index(file.Name(), "~$") && 0 != strings.Index(file.Name(), "Thumbs.db") {
-
-			f := filepath.Join(dir, file.Name())
-
-			// ファイル存在チェック
-			fi, _ := os.Stat(f)
-			if fi.IsDir() {
-				dpaths = append(dpaths, filepath.Join(dir, file.Name()))
-			} else {
-				fpaths = append(fpaths, filepath.Join(dir, file.Name()))
-			}
-		}
-	}
-
-	if nil == dpaths && nil != fpaths {
-		paths = fpaths
-	} else if nil != dpaths && nil == fpaths {
-		paths = dpaths
-	} else {
-		paths = append(dpaths, fpaths...)
-	}
-
-	return paths
 }

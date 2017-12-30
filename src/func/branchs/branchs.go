@@ -4,76 +4,69 @@ import (
 	"fmt"
 	"html/template"
 //	"io"
-	"io/ioutil"
+//	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"../../lib/git"
 	"../../lib/appconfig"
+	"../../lib/util"
+)
+
+const funcname = "branchs"
+
+var (
+	ip string
+	user string
+	branchList [][]string
+	clone string
+	sidelink map[string]string
+	repository map[string]string
+	url string
+	fpath string
 )
 
 type Html struct {
-	User         string
 	Ip           string
+	User         string
 	Repository map[string]string
-	BranchList [][]string
-	Sidelink     map[string]string
 	Clone        string
+	Sidelink     map[string]string
+	BranchList [][]string
 }
 
-func Index(w http.ResponseWriter, r *http.Request) {
-
-	var user string
-	var ip string
-	var branchList [][]string
-	var clone string
-	var url string
-	var fpath string
-	var repository map[string]string
-	var sidelink map[string]string
+func init(){
 
 	// ユーザー設定情報取得
 	userConfig, err := appconfig.Parse("./config/user.json")
 	if err != nil {
 		fmt.Println("error ")
 	}
+
+	// ユーザー情報セット
 	ip = userConfig.Host + ":"+ userConfig.Port
 	url = userConfig.Protocol + "://"+ ip
 	user = userConfig.Username
 
-	// レポジトリー取得
-	fpath = r.URL.Path
-	fpath = strings.Replace(fpath, "/branchs/", "", 1)
-//	fpath = strings.TrimRight(fpath, "/")
+	// repository(navvar)セット
+	repository = map[string]string{}
+	repository = util.CreateRepository(url)
+
+	// clone(navvar)セット
+	clone = url + "/clone"
+}
+
+func Index(w http.ResponseWriter, r *http.Request) {
+
+	// パス取得
+	fpath = strings.Replace(r.URL.Path, "/" + funcname + "/", "", 1)
 	slashNum := strings.Index(fpath, "/")
 	current_repo := fpath[0:slashNum]
 
-	// repositoryセット
-	repository = map[string]string{}
-	repos := dirwalk("./repository")
-	for _, rp := range repos {
-		var link string
-		var name string
-		link = strings.Replace(rp, `\`, "/", -1)      // 1.Windows
-		//link = url + strings.Replace(link, "/", "", 2) // 1.Windows
-		link = url + "/files" + strings.Replace(link, "repository", "", 1) + "/" // 2.Linux
-		name = filepath.Base(rp)
-		repository[link] = name
-	}
-
-	// cloneセット
-	clone = url + "/clone"
-
 	// sidelinkセット
 	sidelink = map[string]string{}
-	funk := []string{"files", "branchs"}
-	for _, f := range funk {
-		//link := strings.Replace(fp, `\`, "/", -1)      // 1.Windows
-		//link = url + strings.Replace(link, "/", "", 2) // 1.Windows
-		link := url + "/" + f + "/" + current_repo + "/" // 2.Linux
-		sidelink[link] = f
-	}
+	sidelink = util.CreateSidevar(url,current_repo)
 
     // あらかじめ戻り先を絶対パスに展開しておく
     prev, err := filepath.Abs(".")
@@ -108,7 +101,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
     // ディレクトリ移動
     os.Chdir(prev)
 
-	// htmlセット
+	// view情報
 	h := Html{
 		User:         user,
 		Ip:           ip,
@@ -120,52 +113,4 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, _ := template.ParseFiles("./resources/view/branchs/index.html")
 	tmpl.Execute(w, h)
-}
-
-func cd(dir string) {
-
-	// あらかじめ戻り先を絶対パスに展開しておく
-	prev, err := filepath.Abs(".")
-	if err != nil {
-		return // ERROR
-	}
-	defer os.Chdir(prev)
-
-	// ディレクトリ移動
-	os.Chdir(dir)
-}
-
-func dirwalk(dir string) []string {
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		panic(err)
-	}
-
-	var paths []string
-	var dpaths []string
-	var fpaths []string
-	for _, file := range files {
-		if 0 != strings.Index(file.Name(), ".") && 0 != strings.Index(file.Name(), "~$") && 0 != strings.Index(file.Name(), "Thumbs.db") {
-
-			f := filepath.Join(dir, file.Name())
-
-			// ファイル存在チェック
-			fi, _ := os.Stat(f)
-			if fi.IsDir() {
-				dpaths = append(dpaths, filepath.Join(dir, file.Name()))
-			} else {
-				fpaths = append(fpaths, filepath.Join(dir, file.Name()))
-			}
-		}
-	}
-
-	if nil == dpaths && nil != fpaths {
-		paths = fpaths
-	} else if nil != dpaths && nil == fpaths {
-		paths = dpaths
-	} else {
-		paths = append(dpaths, fpaths...)
-	}
-
-	return paths
 }

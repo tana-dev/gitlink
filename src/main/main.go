@@ -9,12 +9,6 @@ import (
 
 func main() {
 
-	// ユーザー設定情報取得
-//	userConfig, err := appconfig.Parse("./config/user.json")
-//	if err != nil {
-//		fmt.Println("error ")
-//	}
-
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources/"))))
 
 	http.HandleFunc("/clone/", clone.Index)
